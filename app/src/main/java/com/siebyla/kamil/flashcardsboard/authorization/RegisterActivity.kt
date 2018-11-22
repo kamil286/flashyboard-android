@@ -21,6 +21,7 @@ class RegisterActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "RegisterActivity"
+        var selectedPhotoUri: Uri? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,18 +48,13 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    var selectedPhotoUri: Uri? = null
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-
             selectphoto_imageview_register.setImageBitmap(bitmap)
-
             selectphoto_button_register.alpha = 0f
-
         }
     }
 
@@ -78,7 +74,7 @@ class RegisterActivity : AppCompatActivity() {
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (it.isSuccessful) return@addOnCompleteListener
-                Log.d("Main", "Succesfully created new user in " +
+                Log.d("Main", "Successfully created new user in " +
                         "google db with uid:${it.result.user.uid}")
                 uploadImageToFirebaseStorage()
             }

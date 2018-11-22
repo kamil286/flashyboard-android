@@ -29,7 +29,7 @@ class FlashcardsBoardActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "CreateFlashcardActivity"
-        val USERS: MutableList<User> = mutableListOf()
+        val USERS: ArrayList<User> = ArrayList()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,13 +105,13 @@ class FlashcardsBoardActivity : AppCompatActivity() {
                         adapter.add(FlashcardItem(flashcard, connectedUser!!.profileImageUrl))
                     }
                 }
-                //TODO: Ivestigate why adapter is not attached to recycler view.
+                //TODO: Investigate why adapter is not attached to recycler view.
                 //this is place where solution could be: http://www.chansek.com/RecyclerView-no-adapter-attached-skipping-layout
                 val recyclerView = R.id.recyclerview_new_flashcard as RecyclerView
-                val manager = LinearLayoutManager(context)
-                recyclerView.layoutManager = manager
-                recyclerView.setHasFixedSize(true)
-                recyclerView.adapter = adapter
+                recyclerView.apply {
+                    layoutManager = LinearLayoutManager(context)
+                    setAdapter(adapter)
+                }
             }
             override fun onCancelled(p0: DatabaseError) { }
         })
