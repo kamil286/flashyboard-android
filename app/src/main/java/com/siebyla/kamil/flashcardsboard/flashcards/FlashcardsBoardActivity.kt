@@ -106,6 +106,7 @@ class FlashcardsBoardActivity : AppCompatActivity() {
                     }
                 }
                 //TODO: Ivestigate why adapter is not attached to recycler view.
+                //this is place where solution could be: http://www.chansek.com/RecyclerView-no-adapter-attached-skipping-layout
                 val recyclerView = R.id.recyclerview_new_flashcard as RecyclerView
                 val manager = LinearLayoutManager(context)
                 recyclerView.layoutManager = manager
