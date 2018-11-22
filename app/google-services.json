@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "953413164786",
+    "firebase_url": "https://flascardboard.firebaseio.com",
+    "project_id": "flascardboard",
+    "storage_bucket": "flascardboard.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953413164786:android:d81c660944edd39d",
+        "android_client_info": {
+          "package_name": "com.siebyla.kamil.flashcardsboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "953413164786-bs25ql5870ggk1bjvjqudf9dgtpqtm38.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYMF_XxNa_Du0-IaQCrxIRoYM8r9MBgbw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
