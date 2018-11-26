@@ -34,16 +34,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/btn_dialog"/>
-    <EditText
+    <TextView
             android:layout_width="364dp"
             android:layout_height="95dp"
             android:inputType="textMultiLine"
             android:ems="10"
-            android:id="@+id/flascard_context_text" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/flashcard_title_text" android:layout_marginBottom="8dp"
+            android:id="@+id/flascard_content_text"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/flashcard_title_text"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/imageview_new_flashcard"
-            app:layout_constraintVertical_bias="0.636" app:layout_constraintEnd_toEndOf="@+id/flashcard_title_text"
+            app:layout_constraintVertical_bias="0.636"
+            app:layout_constraintEnd_toEndOf="@+id/flashcard_title_text"
             android:text="Flashcard Content"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.ListView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -17,7 +16,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.siebyla.kamil.flashcardsboard.R
-import com.siebyla.kamil.flashcardsboard.adapters.FlashcardsAdapter
 import com.siebyla.kamil.flashcardsboard.authorization.RegisterActivity
 import com.siebyla.kamil.flashcardsboard.models.Flashcard
 import com.siebyla.kamil.flashcardsboard.models.User
@@ -25,7 +23,6 @@ import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
-import kotlinx.android.synthetic.main.activity_create_flashcard.view.*
 import kotlinx.android.synthetic.main.single_row_new_flashcard.view.*
 
 class FlashcardsBoardActivity : AppCompatActivity() {
@@ -86,6 +83,7 @@ class FlashcardsBoardActivity : AppCompatActivity() {
                     val user = it.getValue(User::class.java)
                     if (user != null) {
                         USERS.add(user)
+                        Log.d("FlashcardBoardActivity", "AddedUser ${user.username}")
                     }
                 }
             }
@@ -97,7 +95,7 @@ class FlashcardsBoardActivity : AppCompatActivity() {
         val ref = FirebaseDatabase.getInstance().getReference("/flashcards")
         ref.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
-                //val adapter = GroupAdapter<ViewHolder>()
+                val adapter = GroupAdapter<ViewHolder>()
                 p0.children.forEach {
                     Log.d(TAG, it.toString())
                     val flashcard = it.getValue(Flashcard::class.java)
@@ -106,22 +104,15 @@ class FlashcardsBoardActivity : AppCompatActivity() {
                         if (connectedUser == null) {
                             Log.d(TAG, "Something went wrong with connected user!")
                         }
-                        //adapter.add(FlashcardItem(flashcard, connectedUser!!.profileImageUrl))
+                        adapter.add(FlashcardItem(flashcard, connectedUser!!.profileImageUrl))
                         FLASHCARDS.add(Flashcard(flashcard.uid, flashcard.title, flashcard.content,
                             flashcard.userUid, connectedUser!!.profileImageUrl))
                     }
                 }
+                Log.d("FlashcardBoardActivity", "AllFlashcards: ${FLASHCARDS[0]}")
 
-                val adapter = FlashcardsAdapter(context, FLASHCARDS)
-
-                val listView = R.id.list_view_new_flashcard as ListView
-                listView.adapter = adapter
-
-//                val recyclerView = R.id.list_view_new_flashcard as ListView
-//                val manager = LinearLayoutManager(context)
-//                recyclerView.layoutManager = manager
-//                recyclerView.setHasFixedSize(true)
-//                recyclerView.adapter = adapter
+                val recyclerView = R.id.recycler_view_new_flashcard as RecyclerView
+                recyclerView.adapter = adapter
             }
             override fun onCancelled(p0: DatabaseError) { }
         })
@@ -130,8 +121,8 @@ class FlashcardsBoardActivity : AppCompatActivity() {
 
 class FlashcardItem(private val flashcard: Flashcard, private val imageUrl: String): Item<ViewHolder>() {
     override fun bind(viewHolder: ViewHolder, position: Int) {
-        viewHolder.itemView.edittext_flashcard_title.setText(flashcard.title)
-        viewHolder.itemView.edittext_flashcard_content.setText(flashcard.content)
+        viewHolder.itemView.flashcard_title_text.text = flashcard.title
+        viewHolder.itemView.flascard_content_text.text = flashcard.content
         Picasso.get().load(imageUrl).into(viewHolder.itemView.imageview_new_flashcard)
     }
 

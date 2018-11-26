@@ -8,7 +8,7 @@
     tools:context=".flashcards.FlashcardsBoardActivity">
 
     <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview_new_flashcard"
+            android:id="@+id/recycler_view_new_flashcard"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -18,3 +18,4 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>
+

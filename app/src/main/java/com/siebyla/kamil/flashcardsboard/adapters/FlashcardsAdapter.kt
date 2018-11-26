@@ -17,8 +17,8 @@ class FlashcardsAdapter(context: Context, private val dataSource: ArrayList<Flas
 
     override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
         val rowView = inflater.inflate(R.layout.single_row_new_flashcard, p2, false)
-        val titleTextView = rowView.findViewById(R.id.edittext_flashcard_title) as TextView
-        val contentTextView = rowView.findViewById(R.id.edittext_flashcard_content) as TextView
+        val titleTextView = rowView.findViewById(R.id.flashcard_title_text) as TextView
+        val contentTextView = rowView.findViewById(R.id.flascard_content_text) as TextView
         val flashcardImageView = rowView.findViewById(R.id.imageview_new_flashcard) as ImageView
 
         val flashcard = getItem(p0) as Flashcard
