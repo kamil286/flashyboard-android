@@ -46,12 +46,12 @@ class CreateFlashcardActivity : AppCompatActivity() {
         val ref = FirebaseDatabase.getInstance().getReference("/flashcards/$uid")
         val flashcard = Flashcard(
             uid, edittext_flashcard_title.text.toString(),
-            edittext_flashcard_content.text.toString(), uid
+            edittext_flashcard_content.text.toString(), uid, ""
         )
 
         ref.setValue(flashcard)
             .addOnSuccessListener {
-                Log.d(TAG, "Finally we saved the flascard to Firebase Database")
+                Log.d(TAG, "Finally we saved the flascard to firebase database")
 
                 val intent = Intent(this, FlashcardsBoardActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)

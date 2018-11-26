@@ -9,12 +9,15 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ListView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.siebyla.kamil.flashcardsboard.R
+import com.siebyla.kamil.flashcardsboard.adapters.FlashcardsAdapter
 import com.siebyla.kamil.flashcardsboard.authorization.RegisterActivity
 import com.siebyla.kamil.flashcardsboard.models.Flashcard
 import com.siebyla.kamil.flashcardsboard.models.User
@@ -30,6 +33,7 @@ class FlashcardsBoardActivity : AppCompatActivity() {
     companion object {
         const val TAG = "CreateFlashcardActivity"
         val USERS: ArrayList<User> = ArrayList()
+        val FLASHCARDS: ArrayList<Flashcard> = ArrayList()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,25 +97,31 @@ class FlashcardsBoardActivity : AppCompatActivity() {
         val ref = FirebaseDatabase.getInstance().getReference("/flashcards")
         ref.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
-                val adapter = GroupAdapter<ViewHolder>()
+                //val adapter = GroupAdapter<ViewHolder>()
                 p0.children.forEach {
                     Log.d(TAG, it.toString())
                     val flashcard = it.getValue(Flashcard::class.java)
                     if (flashcard != null) {
                         val connectedUser = USERS.find { x -> x.uid == flashcard.userUid }
                         if (connectedUser == null) {
-                            Log.d(TAG, "Something wen wrong with connected user!")
+                            Log.d(TAG, "Something went wrong with connected user!")
                         }
-                        adapter.add(FlashcardItem(flashcard, connectedUser!!.profileImageUrl))
+                        //adapter.add(FlashcardItem(flashcard, connectedUser!!.profileImageUrl))
+                        FLASHCARDS.add(Flashcard(flashcard.uid, flashcard.title, flashcard.content,
+                            flashcard.userUid, connectedUser!!.profileImageUrl))
                     }
                 }
-                //TODO: Investigate why adapter is not attached to recycler view.
-                //this is place where solution could be: http://www.chansek.com/RecyclerView-no-adapter-attached-skipping-layout
-                val recyclerView = R.id.recyclerview_new_flashcard as RecyclerView
-                recyclerView.apply {
-                    layoutManager = LinearLayoutManager(context)
-                    setAdapter(adapter)
-                }
+
+                val adapter = FlashcardsAdapter(context, FLASHCARDS)
+
+                val listView = R.id.list_view_new_flashcard as ListView
+                listView.adapter = adapter
+
+//                val recyclerView = R.id.list_view_new_flashcard as ListView
+//                val manager = LinearLayoutManager(context)
+//                recyclerView.layoutManager = manager
+//                recyclerView.setHasFixedSize(true)
+//                recyclerView.adapter = adapter
             }
             override fun onCancelled(p0: DatabaseError) { }
         })
