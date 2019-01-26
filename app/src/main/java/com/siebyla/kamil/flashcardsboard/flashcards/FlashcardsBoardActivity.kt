@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
@@ -14,19 +15,21 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.siebyla.kamil.flashcardsboard.R
+import com.siebyla.kamil.flashcardsboard.adapters.RecycleAdapter
 import com.siebyla.kamil.flashcardsboard.authorization.RegisterActivity
 import com.siebyla.kamil.flashcardsboard.models.Flashcard
 import com.siebyla.kamil.flashcardsboard.models.User
 import com.squareup.picasso.Picasso
-import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.single_row_new_flashcard.view.*
 
 class FlashcardsBoardActivity : AppCompatActivity() {
 
+    var boardAdapter: RecycleAdapter? = null
+
     companion object {
-        const val TAG = "CreateFlashcardActivity"
+        const val TAG = "FlashcardsBoardActivity"
         val USERS: ArrayList<User> = ArrayList()
         val FLASHCARDS: ArrayList<Flashcard> = ArrayList()
     }
@@ -39,7 +42,25 @@ class FlashcardsBoardActivity : AppCompatActivity() {
 
         verifyUserIsLoggedIn()
         fetchUsers()
-        fetchFlashcards(this)
+
+        val iterator2 = USERS.iterator()
+        iterator2.forEach {
+            Log.d(TAG, "Single flashcard is: ${it}")
+        }
+
+        val fls = fetchFlashcards()
+        val iterator = fls.iterator()
+        iterator.forEach {
+            Log.d(TAG, "Single flashcard is: ${it.title}")
+        }
+
+//        boardAdapter = RecycleAdapter(FLASHCARDS)
+//        val viewManager = LinearLayoutManager(this)
+//        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView).apply {
+//            setHasFixedSize(true)
+//            layoutManager = viewManager
+//        }
+//        recyclerView.adapter = boardAdapter
     }
 
     private fun verifyUserIsLoggedIn() {
@@ -81,7 +102,7 @@ class FlashcardsBoardActivity : AppCompatActivity() {
                     val user = it.getValue(User::class.java)
                     if (user != null) {
                         USERS.add(user)
-                        Log.d("FlashcardBoardActivity", "AddedUser ${user.username}")
+                        Log.d(TAG, "AddedUser ${user.username}")
                     }
                 }
             }
@@ -89,31 +110,20 @@ class FlashcardsBoardActivity : AppCompatActivity() {
         })
     }
 
-    private fun fetchFlashcards(context: Context) {
+    private fun fetchFlashcards(): ArrayList<Flashcard> {
+        val flashcards: ArrayList<Flashcard> = ArrayList()
         val ref = FirebaseDatabase.getInstance().getReference("/flashcards")
         ref.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
-                val adapter = GroupAdapter<ViewHolder>()
                 p0.children.forEach {
                     Log.d(TAG, it.toString())
                     val flashcard = it.getValue(Flashcard::class.java)
-                    if (flashcard != null) {
-                        val connectedUser = USERS.find { x -> x.uid == flashcard.userUid }
-                        if (connectedUser == null) {
-                            Log.d(TAG, "Something went wrong with connected user!")
-                        }
-                        adapter.add(FlashcardItem(flashcard, connectedUser!!.profileImageUrl))
-                        FLASHCARDS.add(Flashcard(flashcard.uid, flashcard.title, flashcard.content,
-                            flashcard.userUid, connectedUser!!.profileImageUrl))
-                    }
+                    flashcards.add(flashcard!!)
                 }
-                Log.d("FlashcardBoardActivity", "AllFlashcards: ${FLASHCARDS[0]}")
-
-                val recyclerView = R.id.recycler_view_new_flashcard as RecyclerView
-                recyclerView.adapter = adapter
             }
             override fun onCancelled(p0: DatabaseError) { }
         })
+        return flashcards
     }
 }
 

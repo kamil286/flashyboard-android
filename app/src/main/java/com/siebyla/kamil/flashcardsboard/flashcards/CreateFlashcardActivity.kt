@@ -10,6 +10,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.siebyla.kamil.flashcardsboard.R
 import com.siebyla.kamil.flashcardsboard.models.Flashcard
 import kotlinx.android.synthetic.main.activity_create_flashcard.*
+import java.util.*
 
 
 class CreateFlashcardActivity : AppCompatActivity() {
@@ -42,16 +43,16 @@ class CreateFlashcardActivity : AppCompatActivity() {
     }
 
     private fun saveFlashCardToFirebaseDatabase() {
-        val uid = FirebaseAuth.getInstance().uid ?: ""
+        val uid = UUID.randomUUID().toString()
         val ref = FirebaseDatabase.getInstance().getReference("/flashcards/$uid")
         val flashcard = Flashcard(
             uid, edittext_flashcard_title.text.toString(),
-            edittext_flashcard_content.text.toString(), uid, ""
+            edittext_flashcard_content.text.toString(),"" , ""
         )
 
         ref.setValue(flashcard)
             .addOnSuccessListener {
-                Log.d(TAG, "Finally we saved the flascard to firebase database")
+                Log.d(TAG, "Finally we saved the flashcard to firebase database")
 
                 val intent = Intent(this, FlashcardsBoardActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
