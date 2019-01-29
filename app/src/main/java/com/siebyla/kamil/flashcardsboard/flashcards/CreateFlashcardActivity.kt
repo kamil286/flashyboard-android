@@ -45,10 +45,10 @@ class CreateFlashcardActivity : AppCompatActivity() {
     private fun saveFlashCardToFirebaseDatabase() {
         val uid = UUID.randomUUID().toString()
         val ref = FirebaseDatabase.getInstance().getReference("/flashcards/$uid")
-        val flashcard = Flashcard(
-            uid, edittext_flashcard_title.text.toString(),
-            edittext_flashcard_content.text.toString(),"" , ""
-        )
+        val flashcard = Flashcard.create()
+
+        flashcard.title = edittext_flashcard_title.text.toString()
+        flashcard.content = edittext_flashcard_content.text.toString()
 
         ref.setValue(flashcard)
             .addOnSuccessListener {

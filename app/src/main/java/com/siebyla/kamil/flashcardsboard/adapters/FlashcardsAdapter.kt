@@ -11,33 +11,47 @@ import com.siebyla.kamil.flashcardsboard.R
 import com.siebyla.kamil.flashcardsboard.models.Flashcard
 import com.squareup.picasso.Picasso
 
-class FlashcardsAdapter(context: Context, private val dataSource: ArrayList<Flashcard>): BaseAdapter() {
+class FlashcardsAdapter(context: Context, flashcards: MutableList<Flashcard>): BaseAdapter() {
 
-    private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val mInflater: LayoutInflater = LayoutInflater.from(context)
+    private var itemList = flashcards
 
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        val rowView = inflater.inflate(R.layout.single_row_new_flashcard, p2, false)
-        val titleTextView = rowView.findViewById(R.id.flashcard_title_text) as TextView
-        val contentTextView = rowView.findViewById(R.id.flascard_content_text) as TextView
-        val flashcardImageView = rowView.findViewById(R.id.imageview_new_flashcard) as ImageView
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val objectId: String = itemList[position].objectId as String
+        val title: String = itemList[position].title as String
+        val content: String = itemList[position].content as String
 
-        val flashcard = getItem(p0) as Flashcard
-        titleTextView.text = flashcard.title
-        contentTextView.text = flashcard.content
-        Picasso.get().load(flashcard.imageUrl).into(flashcardImageView)
-
-        return  rowView
+        val view: View
+        val vh: ListRowHolder
+        if (convertView == null) {
+            view = mInflater.inflate(R.layout.single_row_new_flashcard, parent, false)
+            vh = ListRowHolder(view)
+            view.tag = vh
+        } else {
+            view = convertView
+            vh = view.tag as ListRowHolder
+        }
+        vh.title.text = title
+        vh.content.text = content
+        Picasso.get().load(R.drawable.avatar1).into(vh.image)
+        return view
     }
 
-    override fun getItem(p0: Int): Any {
-        return  dataSource[p0]
+    override fun getItem(position: Int): Any {
+        return  itemList[position]
     }
 
-    override fun getItemId(p0: Int): Long {
-        return p0.toLong()
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
     }
 
     override fun getCount(): Int {
-        return dataSource.size
+        return itemList.size
+    }
+
+    private class ListRowHolder(row: View?) {
+        val title: TextView = row!!.findViewById(R.id.flashcard_title_text) as TextView
+        val content: TextView = row!!.findViewById(R.id.flascard_content_text) as TextView
+        val image: ImageView = row!!.findViewById(R.id.imageview_new_flashcard) as ImageView
     }
 }

@@ -20,8 +20,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".flashcards.CreateFlashcardActivity">
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value=".flashcards.FlashcardsBoardActivity"/>
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".flashcards.FlashcardsBoardActivity"/>
         </activity>
     </application>
 
