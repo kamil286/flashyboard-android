@@ -22,8 +22,8 @@ import java.util.*
 
 class FlashcardsBoardActivity : AppCompatActivity() {
 
-    var flashcardsList: MutableList<Flashcard>? = null
-    lateinit var adapter: FlashcardsAdapter
+    private var flashcardsList: MutableList<Flashcard>? = null
+    private lateinit var adapter: FlashcardsAdapter
     private var listViewItems: ListView? = null
 
     companion object {
