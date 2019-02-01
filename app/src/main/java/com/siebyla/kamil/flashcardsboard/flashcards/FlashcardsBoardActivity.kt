@@ -6,29 +6,28 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.ListView
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.siebyla.kamil.flashcardsboard.R
-import com.siebyla.kamil.flashcardsboard.adapters.FlashcardsAdapter
 import com.siebyla.kamil.flashcardsboard.authorization.LoginActivity
 import com.siebyla.kamil.flashcardsboard.authorization.RegisterActivity
 import com.siebyla.kamil.flashcardsboard.models.Flashcard
-import java.util.*
+import com.siebyla.kamil.flashcardsboard.models.User
+import com.squareup.picasso.Picasso
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.Item
+import com.xwray.groupie.ViewHolder
+import kotlinx.android.synthetic.main.activity_flashcards_board.*
+import kotlinx.android.synthetic.main.single_row_new_flashcard.*
+import kotlinx.android.synthetic.main.single_row_new_flashcard.view.*
 
 class FlashcardsBoardActivity : AppCompatActivity() {
 
-    private var flashcardsList: MutableList<Flashcard>? = null
-    private lateinit var adapter: FlashcardsAdapter
-    private var listViewItems: ListView? = null
-
-    companion object {
-        const val TAG = "FlashcardsBoardActivity"
-    }
+    var userToReturn: User = User("","","")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,48 +35,47 @@ class FlashcardsBoardActivity : AppCompatActivity() {
 
         supportActionBar?.title = "FLASHCARDS"
 
+        //attachListeners()
         verifyUserIsLoggedIn()
-
-        listViewItems = findViewById<View>(R.id.list_view_new_flashcard) as ListView
-
-        val mDatabase = FirebaseDatabase.getInstance().reference
-        flashcardsList = mutableListOf<Flashcard>()
-        adapter = FlashcardsAdapter(this, flashcardsList!!)
-        listViewItems!!.adapter = adapter
-        mDatabase.orderByKey().addListenerForSingleValueEvent(itemListener)
+        fetchFlashcards()
     }
 
-    private var itemListener: ValueEventListener = object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            // Get Post object and use the values to update the UI
-            addDataToList(dataSnapshot)
-        }
-        override fun onCancelled(databaseError: DatabaseError) {
-            // Getting Item failed, log a message
-            Log.w(TAG, "loadItem:onCancelled", databaseError.toException())
-        }
-    }
-    private fun addDataToList(dataSnapshot: DataSnapshot) {
-        val items = dataSnapshot.children.iterator()
-        //Check if current database contains any collection
-        if (items.hasNext()) {
-            val flashcardsListIndex = items.next()
-            val itemsIterator = flashcardsListIndex.children.iterator()
-            //check if the collection has any to do items or not
-            while (itemsIterator.hasNext()) {
-                //get current item
-                val currentItem = itemsIterator.next()
-                val flashcardItem = Flashcard.create()
-                //get current data in a map
-                val map = currentItem.value as HashMap<String, Any>
-                flashcardItem.objectId = currentItem.key
-                flashcardItem.title = map["title"] as String?
-                flashcardItem.content = map["content"] as String?
-                flashcardsList!!.add(flashcardItem)
+    private fun fetchFlashcards() {
+        val ref = FirebaseDatabase.getInstance().getReference("/flashcards")
+        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(data: DataSnapshot) {
+                val adapter = GroupAdapter<ViewHolder>()
+                data.children.forEach {
+                    Log.d("Flashcards", it.toString())
+                    val flashcard = it.getValue(Flashcard::class.java)
+                    if (flashcard != null) {
+                        adapter.add(FlashcardItem(flashcard))
+                    }
+                }
+                recycler_view.adapter = adapter
             }
-        }
-        //alert adapter that has changed
-        adapter.notifyDataSetChanged()
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+    }
+
+    private fun getUserForFlashcard(userId: String) {
+        val ref = FirebaseDatabase.getInstance().getReference("/users").child(userId)
+        ref.addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onDataChange(data: DataSnapshot) {
+                data.children.forEach{
+                    val user = it.getValue(User::class.java)
+                    if (user != null && user.uid == userId) {
+                        userToReturn = user
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 
     private fun verifyUserIsLoggedIn() {
@@ -108,6 +106,38 @@ class FlashcardsBoardActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.nav_menu, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun attachListeners() {
+        edit_flashcard_button.setOnClickListener {
+            val intent = Intent(this, EditFlashcard::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.putExtra("uid", "1")
+            startActivity(intent)
+        }
+
+        delete_flashcard_button.setOnClickListener {
+            val ref = FirebaseDatabase.getInstance().getReference("/flashcards")
+            ref.child("1").removeValue()
+                .addOnCompleteListener {
+                    Toast.makeText(applicationContext, "Flashcard has been deleted!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(applicationContext, "Cant delete flashcard because of error: $e", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+}
+
+class FlashcardItem(private val flashcard: Flashcard): Item<ViewHolder>() {
+    override fun bind(viewHolder: ViewHolder, position: Int) {
+        viewHolder.itemView.flashcard_title_text.text = flashcard.title
+        viewHolder.itemView.flascard_content_text.text = flashcard.content
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/flascardboard.appspot.com/o/images%2F1af0a3ab-72e8-4f41-b128-70f8efed5ab8?alt=media&token=47e40e0e-06c5-4795-8f31-2d8526e8799d").into(viewHolder.itemView.imageview_new_flashcard)
+    }
+
+    override fun getLayout(): Int {
+        return  R.layout.single_row_new_flashcard
     }
 }
 
