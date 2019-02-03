@@ -1,3 +1,3 @@
 Project Overview:
 
-This project is made for users who want to share interesting knowledge about history, science etc. I made it using google firebase and kotlin. Actually you are using alpha version of the application, so don't worry, I will try to build more functionalities and made it more effective and user friendly. So have a nice day and see u later! 
+This projkect was made for academic course purpouse. Application allows you to create account and create flashcards with interesting informations and then view it.
